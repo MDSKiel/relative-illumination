@@ -1,0 +1,5 @@
+from nerfstudio.plugins.registry_dataparser import DataParserSpecification
+
+from rawnerfacto.colmap_raw_image_dataparser import ColmapRawImageDataParserConfig
+
+colmap_raw_image_dataparser = DataParserSpecification(config=ColmapRawImageDataParserConfig())

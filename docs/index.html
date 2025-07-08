@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="theme-color" content="#000000" />
+  <link href="assets/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <title>Relative Illumination Fields</title>
+
+  <style>
+    math {
+      font-family: "Latin Modern Math", math;
+    }
+
+    .carousel-control-prev {
+      width: 5%;
+    }
+
+    .carousel-control-next {
+      width: 5%;
+    }
+  </style>
+</head>
+
+<body>
+  <section class="py-5 text-center container">
+    <h1 class="fw-light">Relative Illumination Fields</h1>
+    <p class="lead text-body-secondary">Learning Medium and Light Independent Underwater Scenes</p>
+    <div class="container" style="max-width: 970px;">
+      <div class="row mb-2">
+        <div class="col">
+          <a href="https://orcid.org/0000-0001-9639-1680">Mengkun She</a><sup>1*</sup>
+        </div>
+        <div class="col">
+          <a href="https://orcid.org/0009-0002-6360-6635">Felix Seegräber</a><sup>1*</sup>
+        </div>
+        <div class="col">
+          <a href="https://orcid.org/0000-0001-6461-3357">David Nakath</a><sup>1</sup>
+        </div>
+        <div class="col">
+          <a href="https://orcid.org/0000-0003-3404-8195">Patricia Schöntag</a><sup>1,2</sup>
+        </div>
+        <div class="col">
+          <a href="https://orcid.org/0000-0002-0974-3834">Kevin Köser</a><sup>1</sup>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-auto"><sup>1</sup>Kiel University</div>
+        <div class="col-auto"> <sup>2</sup>GEOMAR Helmholtz Centre for Ocean Research Kiel</div>
+      </div>
+      <div class="row justify-content-center text-muted">
+        (* denotes equal contribution)
+      </div>
+  </section>
+
+  <div class="container text-center">
+    <a role="button" class="btn btn-secondary btn-lg mx-1" href="https://arxiv.org/abs/2504.10024"><span><svg
+          xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
+          <path
+            d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
+          <path
+            d="M4.603 14.087a.8.8 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.7 7.7 0 0 1 1.482-.645 20 20 0 0 0 1.062-2.227 7.3 7.3 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.65-.823.192-.077.4-.12.602-.077a.7.7 0 0 1 .477.365c.088.164.12.356.127.538.007.188-.012.396-.047.614-.084.51-.27 1.134-.52 1.794a11 11 0 0 0 .98 1.686 5.8 5.8 0 0 1 1.334.05c.364.066.734.195.96.465.12.144.193.32.2.518.007.192-.047.382-.138.563a1.04 1.04 0 0 1-.354.416.86.86 0 0 1-.51.138c-.331-.014-.654-.196-.933-.417a5.7 5.7 0 0 1-.911-.95 11.7 11.7 0 0 0-1.997.406 11.3 11.3 0 0 1-1.02 1.51c-.292.35-.609.656-.927.787a.8.8 0 0 1-.58.029m1.379-1.901q-.25.115-.459.238c-.328.194-.541.383-.647.547-.094.145-.096.25-.04.361q.016.032.026.044l.035-.012c.137-.056.355-.235.635-.572a8 8 0 0 0 .45-.606m1.64-1.33a13 13 0 0 1 1.01-.193 12 12 0 0 1-.51-.858 21 21 0 0 1-.5 1.05zm2.446.45q.226.245.435.41c.24.19.407.253.498.256a.1.1 0 0 0 .07-.015.3.3 0 0 0 .094-.125.44.44 0 0 0 .059-.2.1.1 0 0 0-.026-.063c-.052-.062-.2-.152-.518-.209a4 4 0 0 0-.612-.053zM8.078 7.8a7 7 0 0 0 .2-.828q.046-.282.038-.465a.6.6 0 0 0-.032-.198.5.5 0 0 0-.145.04c-.087.035-.158.106-.196.283-.04.192-.03.469.046.822q.036.167.09.346z" />
+        </svg></span>&nbsp;Paper</a>
+    <a role="button" class="btn btn-secondary btn-lg mx-1" href="#"><span><svg xmlns="http://www.w3.org/2000/svg"
+          width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
+          <path
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8" />
+        </svg></span>&nbsp;Code</a>
+    <a role="button" class="btn btn-secondary btn-lg mx-1" href="#"><span><svg xmlns="http://www.w3.org/2000/svg"
+          width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
+          <path
+            d="M4.318 2.687C5.234 2.271 6.536 2 8 2s2.766.27 3.682.687C12.644 3.125 13 3.627 13 4c0 .374-.356.875-1.318 1.313C10.766 5.729 9.464 6 8 6s-2.766-.27-3.682-.687C3.356 4.875 3 4.373 3 4c0-.374.356-.875 1.318-1.313M13 5.698V7c0 .374-.356.875-1.318 1.313C10.766 8.729 9.464 9 8 9s-2.766-.27-3.682-.687C3.356 7.875 3 7.373 3 7V5.698c.271.202.58.378.904.525C4.978 6.711 6.427 7 8 7s3.022-.289 4.096-.777A5 5 0 0 0 13 5.698M14 4c0-1.007-.875-1.755-1.904-2.223C11.022 1.289 9.573 1 8 1s-3.022.289-4.096.777C2.875 2.245 2 2.993 2 4v9c0 1.007.875 1.755 1.904 2.223C4.978 15.71 6.427 16 8 16s3.022-.289 4.096-.777C13.125 14.755 14 14.007 14 13zm-1 4.698V10c0 .374-.356.875-1.318 1.313C10.766 11.729 9.464 12 8 12s-2.766-.27-3.682-.687C3.356 10.875 3 10.373 3 10V8.698c.271.202.58.378.904.525C4.978 9.71 6.427 10 8 10s3.022-.289 4.096-.777A5 5 0 0 0 13 8.698m0 3V13c0 .374-.356.875-1.318 1.313C10.766 14.729 9.464 15 8 15s-2.766-.27-3.682-.687C3.356 13.875 3 13.373 3 13v-1.302c.271.202.58.378.904.525C4.978 12.71 6.427 13 8 13s3.022-.289 4.096-.777c.324-.147.633-.323.904-.525" />
+        </svg></span>&nbsp;Data</a>
+  </div>
+
+  <div class="container py-4">
+    <div id="carouselIndicators" class="carousel slide" data-interval="false" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <div class="row py-1 g-1">
+            <div class="col">
+              <img class="img-fluid" src="assets/images/tank/tank01.jpg" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/tank/tank02.jpg" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/tank/tank03.jpg" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/tank/tank04.jpg" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/tank/tank05.jpg" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/tank/tank06.jpg" />
+            </div>
+          </div>
+          <div class="row">
+            <video autoplay width="100%" loop="true" muted="true" src="assets/videos/tank.mp4" />
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="row py-1 g-1">
+            <div class="col">
+              <img class="img-fluid" src="assets/images/abu/abu1.png" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/abu/abu2.png" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/abu/abu3.png" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/abu/abu4.png" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/abu/abu5.png" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/abu/abu6.png" />
+            </div>
+          </div>
+          <video autoplay width="100%" loop="true" muted="true" src="assets/videos/abu.mp4" />
+        </div>
+        <div class="carousel-item">
+          <div class="row py-1 g-1">
+            <div class="col">
+              <img class="img-fluid" src="assets/images/checker/checker1.png" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/checker/checker2.png" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/checker/checker3.png" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/checker/checker4.png" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/checker/checker5.png" />
+            </div>
+            <div class="col">
+              <img class="img-fluid" src="assets/images/checker/checker6.png" />
+            </div>
+          </div>
+          <video autoplay width="100%" loop="true" muted="true" src="assets/videos/checker.mp4" />
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselIndicators" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselIndicators" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+    <div class="container text-center">
+      <div class="row">
+        <div class="col">Novel View</div>
+        <div class="col">Relative Illumination Field on Scene Density</div>
+        <div class="col">Clean Scene Representation</div>
+      </div>
+    </div>
+  </div>
+
+
+  <section class="container">
+    <h2 class="fw-light text-center">Abstract & Method</h2>
+    <p class="container-sm width-50 text-justify">We address the challenge of constructing a consistent and
+      photorealistic Neural Radiance Field (NeRF) in inhomogeneously illuminated, scattering environments with unknown,
+      co-moving light sources. While most existing works on underwater scene representation focus on homogeneous,
+      globally illuminated scattering mediums, limited attention has been given to such scenarios-such as when a robot
+      explores water deeper than a few tens of meters, where sunlight becomes insufficient. To address this, we propose
+      a novel illumination field that is locally attached to the camera, enabling the capture of uneven lighting effects
+      within the viewing frustum. We combine this with a volumetric representation of the medium to an overall method
+      which effec tively handles the interaction between the dynamic illumination field and the static scattering
+      medium. Evaluation results demonstrate the effectiveness and flexibility of our approach.</p>
+    <img width="100%" src="assets/images/Method.png" />
+    <p class="container-sm width-50 text-justify">
+      The global NeRF MLP <math>
+        <msub>
+          <mi>ℱ</mi>
+          <mrow>
+            <mi mathvariant="normal">Θ</mi>
+          </mrow>
+        </msub>
+      </math> learns both density and color at each ray sample in the world coordinate frame. Simultaneously, each ray
+      sample is transformed into the local camera coordinate frame, with surface normals derived from the predicted
+      density field, allowing the local illumination field MLP <math>
+        <msubsup>
+          <mi class="mathcal">ℱ</mi>
+          <mrow>
+            <mi mathvariant="normal">Θ</mi>
+          </mrow>
+          <mi>l</mi>
+        </msubsup>
+      </math> to estimate the light intensity factor <math>
+        <mi>α</mi>
+      </math> that the sample point receives. Finally, medium-related parameters, that is the attenuation coefficient
+      <math>
+        <msub>
+          <mi>σ</mi>
+          <mrow>
+            <mtext></mtext>
+            <mi>attn</mi>
+          </mrow>
+        </msub>
+      </math>, medium color <math>
+        <msub>
+          <mi>c</mi>
+          <mrow>
+            <mtext></mtext>
+            <mi>med</mi>
+          </mrow>
+        </msub>
+      </math>, and backscatter <math>
+        <msub>
+          <mi>σ</mi>
+          <mrow>
+            <mtext></mtext>
+            <mi>bs</mi>
+          </mrow>
+        </msub>
+      </math> are jointly estimated and integrated together into a underwater volume rendering formulation.
+    </p>
+  </section>
+  <section class="container-sm">
+    <div class="ratio ratio-16x9 mt-5 mb-5">
+      <iframe src="https://www.youtube.com/embed/lepzm_YgHfA?rel=0" allowfullscreen></iframe>
+    </div>
+  </section>
+
+  <script src="assets/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

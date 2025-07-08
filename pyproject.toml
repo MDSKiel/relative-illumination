@@ -1,0 +1,54 @@
+[project]
+name = "relative-illumination"
+description = "Relative Illumination NeRF (co-moving light data) and Rawnerfacto (train on RAW images)"
+version = "0.1.0"
+
+dependencies = [
+    "nerfstudio >= 0.3.0",
+    "rawpy >= 0.21.0",
+    "OpenEXR >= 3.3.2"]
+
+[tool.setuptools.packages.find]
+include = ["rawnerfacto*", "relative_illumination*"]
+
+[tool.ruff]
+line-length = 120
+respect-gitignore = false
+lint.select = [
+    "E",  # pycodestyle errors.
+    "F",  # Pyflakes rules.
+    "I",  # isort formatting.
+    "PLC",  # Pylint convention warnings.
+    "PLE",  # Pylint errors.
+    "PLR",  # Pylint refactor recommendations.
+    "PLW",  # Pylint warnings.
+    "NPY201" # NumPY 2.0 migration https://numpy.org/devdocs/numpy_2_0_migration_guide.html#ruff-plugin
+]
+lint.ignore = [
+    "E501",  # Line too long.
+    "F722",  # Forward annotation false positive from jaxtyping. Should be caught by pyright.
+    "F821",  # Forward annotation false positive from jaxtyping. Should be caught by pyright.
+    "PLR2004",  # Magic value used in comparison.
+    "PLR0915",  # Too many statements.
+    "PLR0913",  # Too many arguments.
+    "PLC0414",  # Import alias does not rename variable. (this is used for exporting names)
+    "PLC1901",  # Use falsey strings.
+    "PLR5501",  # Use `elif` instead of `else if`.
+    "PLR0911",  # Too many return statements.
+    "PLR0912",  # Too many branches.
+    "PLW0603",  # Globa statement updates are discouraged.
+    "PLW2901",  # For loop variable overwritten.
+]
+
+# register the entry point of your new method here:
+[project.entry-points.'nerfstudio.method_configs']
+rawnerfacto = 'rawnerfacto.rawnerfacto_config:rawnerfacto'
+relative-illumination = 'relative_illumination.relative_illumination_config:relative_illumination'
+relative-illumination-big = 'relative_illumination.relative_illumination_config:relative_illumination_big'
+
+[project.entry-points.'nerfstudio.dataparser_configs']
+colmap-raw = 'rawnerfacto.rawparser_config:colmap_raw_image_dataparser'
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+split-on-trailing-comma = false
