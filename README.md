@@ -11,7 +11,7 @@
   </section>
 
   <h3 style="text-align:center;">
-  <a href="https://arxiv.org/abs/2504.10024">Paper</a> | <a href="#">Data</a> |  <a href="#">Project Page</a>
+  <a href="https://arxiv.org/abs/2504.10024">Paper</a> | Data (coming soon) |  <a href="https://mdskiel.github.io/relative-illumination/">Project Page</a>
   </h3>
 
 <section style="text-align:center;">
@@ -72,13 +72,14 @@ ns-install-cli
 ```
 
 # Using Relative illumination
-## 1. Check the help message from the method:
+## 1. Check the help message from the method and dataloader:
 ```
 ns-train relative-illumination --help
 ns-train relative-illumination-big --help
+ns-train relative-illumination colmap-raw --help
 ```
 
-## 2. Train on the rendered data
+## 2. Train on rendered data
 In our rendered data we provide the ground truth poses and camera intrinsics in colmap reconstruction format. Since data format is `.exr` and the reconstruction contains no 3D points, specify `colmap-raw --read_exr True --load_3D_points False` for the dataloader.
 
 ```
@@ -97,7 +98,7 @@ Notes:
 - Set `pipeline.model.model_medium` to `True` for underwater data, `False` for in-air data.
 - `pipeline.model.apply_srgb` will apply srgb to the final output. Is overriden in the viewer by the checkbox. Mostly relevant for rendering.
 
-## 3. Train on the real-world data
+## 3. Train on real-world data
 For real-world raw data we use the `RawNeRF` data convention of providing images in `.DNG` format with metadata in a `.json`. A `colmap` reconstruction is required, which we provide for our dataset.
 
 ```
