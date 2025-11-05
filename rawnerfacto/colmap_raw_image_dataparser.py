@@ -6,7 +6,7 @@ import json
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Literal, Optional, Type
+from typing import Optional, Type
 
 import Imath
 import numpy as np
@@ -26,6 +26,8 @@ try:
 except ImportError:
     import newrawpy as rawpy  # type: ignore
 
+from exiftool import ExifToolHelper
+
 
 @dataclass
 class ColmapRawImageDataParserConfig(ColmapDataParserConfig):
@@ -39,9 +41,11 @@ class ColmapRawImageDataParserConfig(ColmapDataParserConfig):
     max_number_of_images: Optional[int] = None
     """If set will only take the first n images out of the raw directory."""
     disable_raw: bool = False
-    """Act as the default colmap parser but add c2w poses to the camera metadata (relevant for illumination field)"""
+    """Act as the default colmap parser but add c2w poses to the camera metadata (relevant for illumination field). Useful to read non raw, linear, constant exposure data."""
     read_exr: bool = False
-    """Read exr images"""
+    """Read exr images. Assumed to be constant exposure (rendered), linear data."""
+    input_is_srgb: bool = False
+    """If enabled allow reading non raw images with exposure time EXIF data. Will apply srgb to linear transformation and exposure normalize."""
     # These can disable pose modifications, e.g. to retain reconstruction coordinate system
     # center_method: Literal["poses", "focus", "none"] = "none"
     # orientation_method: Literal["pca", "up", "vertical", "none"] = "none"
@@ -78,16 +82,17 @@ class ColmapRawImageDataParser(ColmapDataParser):
         raw_path = self.config.data / self.config.raw_path
         assert raw_path.exists(), f"Raw path {raw_path} does not exist."
 
-        # Determine the raw image extension. Supported format is [".raw"]
-        def get_raw_ext(raw_path, allowed_exts):
-            # Hard set recursive as True
-            recursive = True
-            glob_str = "**/[!.]*" if recursive else "[!.]*"
-            raw_paths = [p for p in raw_path.glob(glob_str) if p.suffix.lower() in allowed_exts]
-            assert len(raw_paths) > 0, "Raw path does not contain any raw images."
-            return raw_paths[0].suffix
+        if not self.config.input_is_srgb:
+            # Determine the raw image extension. Supported format is [".raw"]
+            def get_raw_ext(raw_path, allowed_exts):
+                # Hard set recursive as True
+                recursive = True
+                glob_str = "**/[!.]*" if recursive else "[!.]*"
+                raw_paths = [p for p in raw_path.glob(glob_str) if p.suffix.lower() in allowed_exts]
+                assert len(raw_paths) > 0, "Raw path does not contain any raw images."
+                return raw_paths[0].suffix
 
-        raw_ext = get_raw_ext(raw_path, [".dng"] if not self.config.read_exr else [".exr"])
+            raw_ext = get_raw_ext(raw_path, [".dng"] if not self.config.read_exr else [".exr"])
 
         meta = self._get_all_images_and_cameras(colmap_path)
         camera_type = CAMERA_MODEL_TO_TYPE[meta["camera_model"]]
@@ -129,9 +134,13 @@ class ColmapRawImageDataParser(ColmapDataParser):
                 )
             )
 
-            # swap the image file name extension by the raw extension
-            fname = Path(frame["file_path"]).with_suffix(raw_ext).name
-            image_filenames.append(self.config.data / self.config.raw_path / fname)
+            if self.config.input_is_srgb:
+                image_filenames.append(Path(frame["file_path"]))
+            else:
+                # swap the image file name extension by the raw extension
+                fname = Path(frame["file_path"]).with_suffix(raw_ext).name
+                image_filenames.append(self.config.data / self.config.raw_path / fname)
+
             poses.append(frame["transform_matrix"])
             if "mask_path" in frame:
                 mask_filenames.append(Path(frame["mask_path"]))
@@ -166,6 +175,9 @@ class ColmapRawImageDataParser(ColmapDataParser):
 
         # Exif files should be read before the split. Because it contains all meta information of the entire dataset.
         exif_filenames = [path.with_suffix(".json") for path in image_filenames]
+
+        if self.config.input_is_srgb:
+            image_filenames_before_split = image_filenames
 
         image_filenames = [image_filenames[i] for i in indices]
         mask_filenames = [mask_filenames[i] for i in indices] if len(mask_filenames) > 0 else []
@@ -218,6 +230,42 @@ class ColmapRawImageDataParser(ColmapDataParser):
                 global_max = max(global_max, maximum)
                 global_min = min(global_min, minimum)
             cam_meta.update({"white_level": global_max, "black_level": global_min})
+        elif self.config.input_is_srgb:  # sRGB
+            # Read the exposure time.
+            def read_exposure(p, et: ExifToolHelper):
+                for d in et.get_metadata(p):
+                    return d["EXIF:ExposureTime"]
+
+            with ExifToolHelper() as et:
+                shutter_speeds = np.array([read_exposure(p, et) for p in image_filenames_before_split], np.float32)
+            unique_shutters = np.sort(np.unique(shutter_speeds))
+            exposure_idx = np.zeros_like(shutter_speeds, dtype=np.int32)
+            for i, shutter in enumerate(unique_shutters):
+                # Assign index `i` to all images with shutter speed `shutter`.
+                exposure_idx[shutter_speeds == shutter] = i
+            # Rescale to use relative shutter speeds, where 1. is the brightest.
+            # This way the NeRF output with exposure=1 will always be reasonable.
+            exposure_values = shutter_speeds / unique_shutters[0]
+            # Calculate the default value for exposure level when rendering, defaults to 97% of the first image
+            if len(image_filenames) > 0:
+                from PIL import Image
+
+                im0 = np.array(Image.open(image_filenames[0].as_posix()))
+                im0 = im0 / np.float32(255)
+                im0_linear = raw_utils.srgb_to_linear(im0)
+                exposure = np.percentile(im0_linear, self.config.exposure_percentile)
+            else:
+                exposure = 0.5
+
+            cam_meta.update(
+                {
+                    "exposure": torch.tensor([exposure], dtype=torch.float32),
+                    "exposure_values": torch.from_numpy(exposure_values)[idx_tensor]
+                    .unsqueeze(-1)
+                    .to(dtype=torch.float32),
+                    "exposure_idx": torch.from_numpy(exposure_idx)[idx_tensor].unsqueeze(-1),
+                }
+            )
 
         else:  # raw
             # Before constructing the Camera dataparser output. We need to process the exif data to obtain the meta information of the raw images.
@@ -253,8 +301,7 @@ class ColmapRawImageDataParser(ColmapDataParser):
             white_level = tmp_cam_meta["WhiteLevel"]
             cam2rgb = tmp_cam_meta["cam2rgb"]
             bayer_pattern = tmp_cam_meta["CFAPattern2"]
-            # Calculate value for exposure level when gamma mapping, defaults to 97%.
-            # Always based on full resolution image 0 (for consistency).
+            # Calculate the default value for exposure level when rendering, defaults to 97% of the first image
             if len(image_filenames) > 0:
                 with open(image_filenames[0].as_posix(), "rb") as f:
                     raw0 = rawpy.imread(f).raw_image
@@ -299,7 +346,7 @@ class ColmapRawImageDataParser(ColmapDataParser):
                 scale_rounding_mode=self.config.downscale_rounding_mode,
             )
 
-        if not self.config.read_exr and len(image_filenames) > 0:
+        if not self.config.read_exr and not self.config.input_is_srgb and len(image_filenames) > 0:
             # Get bayer mask if we train on raw pixels.
             image_coords = cameras.get_image_coords(pixel_offset=0)
             bayer_mask = raw_utils.pixels_to_bayer_mask(

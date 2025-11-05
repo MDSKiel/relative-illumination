@@ -43,6 +43,7 @@ class RawImageDataset(InputDataset):
 
     def get_data(self, image_idx: int, image_type: Literal["uint8", "float32"] = "float32") -> Dict:
         read_exr = self._dataparser_outputs.image_filenames[image_idx].suffix.lower() == ".exr"
+        read_dng = self._dataparser_outputs.image_filenames[image_idx].suffix.lower() == ".dng"
 
         if read_exr:
             image = exr.File(self._dataparser_outputs.image_filenames[image_idx].as_posix()).channels()["RGB"].pixels
@@ -57,14 +58,23 @@ class RawImageDataset(InputDataset):
                 - self._dataparser_outputs.cameras.metadata["black_level"]
             )
             image = torch.tensor(image, dtype=torch.float32)
+        elif read_dng:
+            image = self.get_image_raw(image_idx)
         elif (
-            self._dataparser_outputs.cameras.metadata is None
-            or "exposure" not in self._dataparser_outputs.cameras.metadata
+            self._dataparser_outputs.cameras.metadata is not None
+            or "exposure" in self._dataparser_outputs.cameras.metadata
         ):
+            # input_is_srgb, non raw, non linear, with exposure
+            data = super().get_data(image_idx, image_type)
+            exposure_value = self._dataparser_outputs.cameras.metadata["exposure_values"][image_idx]
+            from rawnerfacto.raw_utils import srgb_to_linear
+
+            im_linear = srgb_to_linear(data["image"])
+            data["image"] = im_linear / exposure_value
+            return data
+        else:
             # no raw image
             return super().get_data(image_idx, image_type)
-        else:
-            image = self.get_image_raw(image_idx)
 
         data = {"image_idx": image_idx, "image": image}
 

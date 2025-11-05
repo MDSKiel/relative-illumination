@@ -43,7 +43,6 @@ class RelativeIlluminationField(nn.Module):
         max_res = 2048 if big else max_res
         hidden_dim = 64 if big else hidden_dim
 
-
         self.register_buffer("aabb", aabb)
         self.geo_feat_dim = geo_feat_dim
 

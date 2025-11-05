@@ -1,31 +1,47 @@
-from typing import Any, Mapping, MutableMapping, Optional, Sequence, List
-from jaxtyping import Int
+from typing import Any, List, Mapping, MutableMapping, Optional, Sequence, Union
+
 import numpy as np
 import torch
 from torch import Tensor
 
-# The following code for raw data processing comes from RawNeRF:
+# The following code for raw data processing is based on RawNeRF:
 # https://github.com/google-research/multinerf/blob/main/internal/raw_utils.py
 
 
-def linear_to_srgb(linear: Tensor, eps: Optional[float] = None) -> Tensor:
+def linear_to_srgb(linear: Union[np.ndarray, Tensor], eps: Optional[float] = None) -> Union[np.ndarray, Tensor]:
     """Assumes `linear` is in [0, 1], see https://en.wikipedia.org/wiki/SRGB."""
-    if eps is None:
-        eps = torch.finfo(torch.float32).eps
-    eps = torch.tensor(eps).to(linear)
-    srgb0 = 323 / 25 * linear
-    srgb1 = (211 * torch.maximum(eps, linear) ** (5 / 12) - 11) / 200
-    return torch.where(linear <= 0.0031308, srgb0, srgb1)
+    is_np = isinstance(linear, np.ndarray)
+    if is_np:
+        if eps is None:
+            eps = np.finfo(np.float32).eps
+        srgb0 = 323 / 25 * linear
+        srgb1 = (211 * np.maximum(eps, linear) ** (5 / 12) - 11) / 200
+        return np.where(linear <= 0.0031308, srgb0, srgb1)
+    else:
+        if eps is None:
+            eps = torch.finfo(torch.float32).eps
+        eps = torch.tensor(eps).to(linear)
+        srgb0 = 323 / 25 * linear
+        srgb1 = (211 * torch.maximum(eps, linear) ** (5 / 12) - 11) / 200
+        return torch.where(linear <= 0.0031308, srgb0, srgb1)
 
 
-def srgb_to_linear(srgb: Tensor, eps: Optional[float] = None) -> Tensor:
+def srgb_to_linear(srgb: Union[np.ndarray, Tensor], eps: Optional[float] = None) -> Union[np.ndarray, Tensor]:
     """Assumes `srgb` is in [0, 1], see https://en.wikipedia.org/wiki/SRGB."""
-    if eps is None:
-        eps = torch.finfo(torch.float32).eps
-    eps = torch.tensor(eps).to(srgb)
-    linear0 = 25 / 323 * srgb
-    linear1 = np.maximum(eps, ((200 * srgb + 11) / (211))) ** (12 / 5)
-    return torch.where(srgb <= 0.04045, linear0, linear1)
+    is_np = isinstance(srgb, np.ndarray)
+    if is_np:
+        if eps is None:
+            eps = np.finfo(np.float32).eps
+        linear0 = 25 / 323 * srgb
+        linear1 = np.maximum(eps, ((200 * srgb + 11) / (211))) ** (12 / 5)
+        return np.where(srgb <= 0.04045, linear0, linear1)
+    else:
+        if eps is None:
+            eps = torch.finfo(torch.float32).eps
+        eps = torch.tensor(eps).to(srgb)
+        linear0 = 25 / 323 * srgb
+        linear1 = torch.maximum(eps, ((200 * srgb + 11) / (211))) ** (12 / 5)
+        return torch.where(srgb <= 0.04045, linear0, linear1)
 
 
 def postprocess_raw(
@@ -140,7 +156,7 @@ def bilinear_demosaic(bayer: np.ndarray, pattern: List[int]) -> np.ndarray:
         g1, b, r, g2 = [bayer[(i // 2) :: 2, (i % 2) :: 2] for i in range(4)]
     else:
         raise NotImplementedError(
-            f"Unsupported Bayer pattern, please make sure the input data is one of 'RGGB', 'BGGR', 'GRBG', 'GBRG'"
+            "Unsupported Bayer pattern, please make sure the input data is one of 'RGGB', 'BGGR', 'GRBG', 'GBRG'"
         )
 
     r = bilinear_upsample(r)

@@ -30,7 +30,7 @@ relative_illumination = MethodSpecification(
                 eval_num_rays_per_chunk=1 << 13,
                 average_init_density=0.01,
                 camera_optimizer=CameraOptimizerConfig(mode="off"),
-                big_field=False
+                big_field=False,
             ),
         ),
         optimizers={
@@ -82,7 +82,7 @@ relative_illumination_big = MethodSpecification(
                 hidden_dim_color=128,
                 max_res=4096,
                 log2_hashmap_size=21,
-                big_field=True
+                big_field=True,
             ),
         ),
         optimizers={
