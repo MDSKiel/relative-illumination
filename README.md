@@ -11,7 +11,7 @@
   </section>
 
   <h3 style="text-align:center;">
-  <a href="https://arxiv.org/abs/2504.10024">Paper</a> | Data (coming soon) |  <a href="https://mdskiel.github.io/relative-illumination/">Project Page</a>
+  <a href="https://arxiv.org/abs/2504.10024">Paper</a> |  <a href="https://opendata.uni-kiel.de/receive/fdr_mods_00000261">Data</a> |  <a href="https://mdskiel.github.io/relative-illumination/">Project Page</a>
   </h3>
 
 <section style="text-align:center;">
