@@ -11,7 +11,7 @@
   </section>
 
   <h3 style="text-align:center;">
-  <a href="https://arxiv.org/abs/2504.10024">Paper</a> |  <a href="https://opendata.uni-kiel.de/receive/fdr_mods_00000261">Data</a> |  <a href="https://mdskiel.github.io/relative-illumination/">Project Page</a>
+  <a href="https://openaccess.thecvf.com/content/ICCV2025/papers/She_Relative_Illumination_Fields_Learning_Medium_and_Light_Independent_Underwater_Scenes_ICCV_2025_paper.pdf">Paper</a> |  <a href="https://opendata.uni-kiel.de/receive/fdr_mods_00000261">Data</a> |  <a href="https://mdskiel.github.io/relative-illumination/">Project Page</a>
   </h3>
 
 <section style="text-align:center;">
