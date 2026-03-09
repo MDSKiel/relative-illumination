@@ -28,7 +28,31 @@
 </p>
 
 # Setup
-## 1. Create a Conda environment and install Nerfstudio dependencies
+
+## 1. Clone the repository
+
+```
+git clone https://cau-git.rz.uni-kiel.de/inf-ag-koeser/relative-illumination
+```
+
+## 2a. Use the provided Dockerfile
+
+We provide a Dockerfile which pins OS, Cuda and PyTorch versions and should avoid headaches when installing dependencies. 
+```
+cd relative-illumination
+# image will be named 'rel-illum'
+docker build . -t rel-illum
+# run the image as an interactive container and mount the repo to /workspace
+docker run --rm --gpus all -it -v .:/workspace  rel-illum:latest
+# Install the repo and register it with Nerfstudio
+pip install -e .
+ns-install-cli
+```
+After this you can continue with usage. To access training data from inside the container you may need to [mount](https://docs.docker.com/engine/storage/bind-mounts/#options-for---volume) additional directories. To view the training through the Nerfstudio viser you may also need to [forward](https://docs.docker.com/reference/cli/docker/container/run/#publish) the relevant container port to the host by passing e.g. `-p 127.0.0.1:7007:7007` to the run command.
+
+We also provide a `dockercontainer.json` for usage with VSCode.
+
+## 2b. (Or) Create a Conda environment and install Nerfstudio dependencies
 
 Please follow the instructions to install **[Nerfstudio](https://docs.nerf.studio/quickstart/installation.html#)** and remember to also install`tiny-cuda-nn`.
 As an example for our Ubuntu 22.04 system, we do the following:
@@ -55,12 +79,6 @@ pip install -e .
 
 # For Tab completion
 ns-install-cli
-```
-
-## 2. Clone the repository
-
-```
-git clone https://cau-git.rz.uni-kiel.de/inf-ag-koeser/relative-illumination
 ```
 
 ## 3. Install the repo to register with Nerfstudio

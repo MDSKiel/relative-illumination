@@ -6,7 +6,8 @@ version = "0.1.0"
 dependencies = [
     "nerfstudio >= 0.3.0",
     "rawpy >= 0.21.0",
-    "OpenEXR >= 3.3.2"]
+    "OpenEXR >= 3.3.2",
+    "PyExifTool >=0.5.6"]
 
 [tool.setuptools.packages.find]
 include = ["rawnerfacto*", "relative_illumination*"]
